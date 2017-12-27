@@ -1,9 +1,10 @@
+
 import numpy as np
 import pandas as pd
 import sklearn
 # load data
-train_ori=pd.read_csv("C:\\Users\\Administrator\\Desktop\\大数据竞赛-风险识别算法赛\\train.csv")
-test_ori=pd.read_csv("C:\\Users\\Administrator\\Desktop\\大数据竞赛-风险识别算法赛\\pred.csv")
+train_ori=pd.read_csv("/Users/cp/Documents/job/smartdec/AL_COMPETITION/workfile/train.csv")
+test_ori=pd.read_csv("/Users/cp/Documents/job/smartdec/AL_COMPETITION/workfile/pred.csv")
 ################## random forest#############################################################
 import matplotlib .pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
@@ -20,6 +21,16 @@ scores1=cross_validate(modelRF,train_feature,train_tag,cv=10,scoring=scoring)
 scores2=cross_val_score(modelRF,train_feature,train_tag,cv=10,scoring='f1_macro')
 modelRF.fit(train_feature,train_tag)
 modelRF_test_y=modelRF.predict(test_feature)
+
+
+### output csv
+output=pd.DataFrame({'ID':np.array(test_ori.iloc[:,0]),'LABEL':modelRF_test_y})
+
+output.to_csv("/Users/cp/Documents/job/smartdec/AL_COMPETITION/workfile/RF_1_pred.csv",index=False,sep=',')
+
+
+
+
 label=pd.DataFrame(modelRF_test_y)
 label.columns=['label']
 # label.groupby(['label']).count()
