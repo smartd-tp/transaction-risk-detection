@@ -1,0 +1,33 @@
+import numpy as np
+import pandas as pd
+import sklearn
+# load data
+train_ori=pd.read_csv("C:\\Users\\Administrator\\Desktop\\大数据竞赛-风险识别算法赛\\train.csv")
+test_ori=pd.read_csv("C:\\Users\\Administrator\\Desktop\\大数据竞赛-风险识别算法赛\\pred.csv")
+################## random forest#############################################################
+import matplotlib .pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+from sklearn.model_selection import cross_validate
+from sklearn.metrics import recall_score
+train_feature= np.array(train_ori.iloc[:,1:32])
+test_feature= np.array(test_ori.iloc[:,1:32])
+train_tag=np.array(train_ori.iloc[:,32])
+scoring=['precision_macro','recall_macro']
+modelRF = RandomForestClassifier(max_depth=5, random_state=0)
+scores1=cross_validate(modelRF,train_feature,train_tag,cv=10,scoring=scoring)
+scores2=cross_val_score(modelRF,train_feature,train_tag,cv=10,scoring='f1_macro')
+modelRF.fit(train_feature,train_tag)
+modelRF_test_y=modelRF.predict(test_feature)
+label=pd.DataFrame(modelRF_test_y)
+label.columns=['label']
+# label.groupby(['label']).count()
+#
+label
+# label.where(['label']==1)
+pd.value_counts(label.label)
+
+train_ori['ID'].plot(kind='kde')
+test_ori['ID'].plot(kind='kde')
+plt.show()
