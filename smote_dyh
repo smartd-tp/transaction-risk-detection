@@ -1,0 +1,33 @@
+import pandas            as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+import seaborn as sns
+from imblearn.combine import SMOTEENN
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.decomposition import PCA
+
+
+train=pd.read_csv(r"C:\Users\Administrator\Desktop\大数据竞赛-风险识别算法赛\train.csv",delimiter=',')
+sm = SMOTEENN()
+train.columns
+X_resampled, y_resampled = sm.fit_sample(x,np.array(train['Label']))
+train_smo = pd.DataFrame(X_resampled)
+train_smo.to_csv(r"C:\Users\Administrator\Desktop\大数据竞赛-风险识别算法赛\train_smo.csv")import pandas            as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+import seaborn as sns
+from imblearn.combine import SMOTEENN
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.decomposition import PCA
+
+
+train=pd.read_csv(r"C:\Users\Administrator\Desktop\大数据竞赛-风险识别算法赛\train.csv",delimiter=',')
+sm = SMOTEENN()
+train.columns
+X_resampled, y_resampled = sm.fit_sample(x,np.array(train['Label']))
+train_smo = pd.DataFrame(X_resampled)
+train_smo.to_csv(r"C:\Users\Administrator\Desktop\大数据竞赛-风险识别算法赛\train_smo.csv")
