@@ -12,7 +12,7 @@ PCA检视正例分布情况
 多分类器投票
 有监督将反例剔除一部分后再做异常点检测（isolation tree）
 cross validation
-smote处理样本
+smote处理样本／调试k值，borderline
 
 低优先级：
 神经网络RBM
