@@ -6,13 +6,14 @@
 可选方案：
 高优先级：
 XGboost 变量筛选
-随机森林调试
+随机森林调试 *done
 按照交易密度将数据分群
-PCA检视正例分布情况
+PCA检视正例分布情况  *done 已做过pca
 多分类器投票
 有监督将反例剔除一部分后再做异常点检测（isolation tree）
-cross validation
-smote处理样本／调试k值，borderline
+cross validation  *done
+smote处理样本／调试k值，borderline  *done
+测试不同的imbalance处理方法： smoteenn, balancecascade
 
 低优先级：
 神经网络RBM
