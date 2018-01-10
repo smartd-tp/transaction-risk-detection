@@ -1,91 +1,71 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
+Created on Fri Dec 29 23:36:58 2017
 
-This is a temporary script file.
+@author: garftalk
 """
-import numpy as np
+
 import pandas as pd
+import numpy as np
 import xgboost as xgb
-from sklearn.cross_validation import train_test_split
-#导入数据，将数据分成测试集和验证集
-data=pd.read_csv('D:/train.csv')
-train_xy,val = train_test_split(data, test_size = 0.3,random_state=1)
-y = train_xy.Label
-X = train_xy.drop(['Label'],axis=1)
-val_y = val.Label
-val_X = val.drop(['Label'],axis=1)
+from xgboost.sklearn import XGBClassifier
+from imblearn.combine import SMOTEENN
+from sklearn.metrics import f1_score  ,confusion_matrix
+from sklearn import  metrics   #Additional     scklearn functions
+train = pd.read_csv(r"F:\finances\trains.csv")
+train_x = train.iloc[:,1:-1]
+train_y = train['Label']
+sm = SMOTEENN(ratio={1:40000})
+X_resampled, y_resampled = sm.fit_sample(np.array(train_x), np.array(train_y))
+pred = pd.read_csv(r"F:\finances\pred.csv")
+from matplotlib.pylab import rcParams
+rcParams['figure.figsize'] = 12, 4
+target = 'Label'
+IDcol = 'ID'
+def modelfit(alg, dtrain, predictors,useTrainCV=True, cv_folds=5, early_stopping_rounds=50):
+    if useTrainCV:
+        xgb_param = alg.get_xgb_params()
+        xgtrain = xgb.DMatrix(dtrain[predictors].values, label=dtrain[target].values)
+        cvresult = xgb.cv(xgb_param, xgtrain, num_boost_round=alg.get_params()['n_estimators'], nfold=cv_folds,
+            metrics='auc', early_stopping_rounds=early_stopping_rounds)
+        alg.set_params(n_estimators=cvresult.shape[0])
+    
+        #Fit the algorithm on the data
+        alg.fit(dtrain[predictors], dtrain[target],eval_metric='auc')
+        
+        #Predict training set:
+        dtrain_predictions = alg.predict(dtrain[predictors])
+        pred_y = alg.predict(pred[predictors])
+        ori_pred = alg.predict(train[predictors])
+        output = pd.concat([pred,pd.DataFrame({'Label':pred_y})],axis = 1)
+        dtrain_predprob = alg.predict_proba(dtrain[predictors])[:,1]
+        
+        #Print model report:
+        print("\nModel Report")
+        print("Accuracy : %.4g" % metrics.accuracy_score(dtrain[target].values, dtrain_predictions))
+        print("AUC Score (Train): %f" % metrics.roc_auc_score(dtrain[target], dtrain_predprob))
+        print("f1_score:%f" % f1_score(np.array(dtrain[target]),dtrain_predictions))
+        print(confusion_matrix(np.array(dtrain[target]),dtrain_predictions))
+        print("f1_score_ori:%f" % f1_score(np.array(train[target]),ori_pred))
+        print("ori_confuse:")
+        print(confusion_matrix(np.array(train[target]),ori_pred))
+        print(pd.DataFrame(pred_y)[0].value_counts())
+        return output
 
-
-
-
-#输入参数
-params={
-'booster':'gbtree',#运用提升树模型
-'objective': 'multi:softmax', #多分类的问题
-'num_class':2, # 类别数，与 multisoftmax 并用
-'gamma':0.1,  # 用于控制是否后剪枝的参数,越大越保守，一般0.1、0.2这样子。
-'max_depth':8, # 构建树的深度，越大越容易过拟合
-'lambda':2,  # 控制模型复杂度的权重值的L2正则化项参数，参数越大，模型越不容易过拟合。
-'subsample':0.7, # 随机采样训练样本
-'colsample_bytree':0.7, # 生成树时进行的列采样
-'min_child_weight':3, 
-# 这个参数默认是 1，是每个叶子里面 h 的和至少是多少，对正负样本不均衡时的 0-1 分类而言
-#，假设 h 在 0.01 附近，min_child_weight 为 1 意味着叶子节点中最少需要包含 100 个样本。
-#这个参数非常影响结果，控制叶子节点中二阶导的和的最小值，该参数值越小，越容易 overfitting。 
-'silent':0 ,#设置成1则没有运行信息输出，最好是设置为0.
-'eta': 0.004, # 如同学习率
-'seed':1000,
-'nthread':7,# cpu 线程数
-#'eval_metric': 'auc'
-}
-
-plst = list(params.items())
-num_rounds = 5000 # 迭代次数
-#将数据做成矩阵形式
-xgb_val = xgb.DMatrix(val_X,label=val_y)
-xgb_train = xgb.DMatrix(X, label=y)
-watchlist = [(xgb_train, 'train'),(xgb_val, 'test')]  
-
-
-
-
-
-#生成xgboost模型
-bst=xgb.train(params,xgb_train,num_boost_round=100,evals=watchlist)
-
-#模型指标产出
-
-#将测试集导入至模型中进行预测
-ypred=bst.predict(xgb_val)
-# 设置阈值, 输出一些评价指标，找出1的数量
-
-y_pred =(ypred >= 0.5)*1
-
-#产出指标和混淆矩阵
-from sklearn import metrics
-print ('AUC: %.4f' % metrics.roc_auc_score(val_y,ypred))
-print ('ACC: %.4f' % metrics.accuracy_score(val_y,y_pred))
-print ('Recall: %.4f' % metrics.recall_score(val_y,y_pred))
-print ('F1-score: %.4f' %metrics.f1_score(val_y,y_pred))
-print ('Precesion: %.4f' %metrics.precision_score(val_y,y_pred))
-cmatrix=metrics.confusion_matrix(val_y,y_pred)
-print(cmatrix)
-
-#输出观测值打分项
-#最后一列是bias
-ypred = bst.predict(xgb_val)
-print(ypred)
-
-#每个特征的贡献分值
-
-ypred_contribs= bst.predict(xgb_val, pred_contribs=True)
-score_a = sum(ypred_contribs[0])
-print (score_a)
-score_b = sum(ypred_contribs[1])
-print (score_b)
-
-
- 
-
-
+predictors = [x for x in train.columns if x not in [target,IDcol]]
+train_resample_x = pd.DataFrame(X_resampled,columns = predictors,index = [x for x in range(0,X_resampled.shape[0],1)])
+train_resample_y = pd.DataFrame({'Label':y_resampled})
+train_resampled = pd.concat([train_resample_x,train_resample_y],axis=1)
+xgb1 = XGBClassifier(
+ learning_rate =0.1,
+ n_estimators=500,
+ max_depth=5,
+ min_child_weight=1,
+ gamma=0,
+ subsample=0.8,
+ colsample_bytree=0.8,
+ objective= 'binary:logistic',
+ nthread=4,
+ scale_pos_weight=1,
+ seed=27)
+output = modelfit(xgb1, train_resampled, predictors)
