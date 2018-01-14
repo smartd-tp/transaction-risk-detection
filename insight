@@ -5,17 +5,19 @@
 
 可选方案：
 高优先级：
-XGboost 变量筛选
 随机森林调试 *done
-按照交易密度将数据分群
+按照交易密度将数据分群/knn/kmeans+  后续xgboost
 PCA检视正例分布情况  *done 已做过pca
-多分类器投票
-有监督将反例剔除一部分后再做异常点检测（isolation tree）
+多分类器投票／stacking
+有监督将反例剔除一部分后再做异常点检测（isolation tree）／通过不同smote比例的训练集不同的分类器，将各分类器分类不一致的点筛选出来P1，
+  也筛选出测试集分类不一致的点P2，计算P1，P2点集两两之间的距离，然后将离P2点最近的p1点的label赋给p2
+  
 cross validation  *done
 smote处理样本／调试k值，borderline  *done
 测试不同的imbalance处理方法： smoteenn, balancecascade
 
 低优先级：
+XGboost 变量筛选
 神经网络RBM
 LTSM
 LOF
