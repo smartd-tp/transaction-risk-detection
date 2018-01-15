@@ -11,7 +11,8 @@ PCA检视正例分布情况  *done 已做过pca
 stacking参数调整（grid search）
 多分类器投票／stacking
 有监督将反例剔除一部分后再做异常点检测（isolation tree）／通过不同smote比例的训练集不同的分类器，将各分类器分类不一致的点筛选出来P1，
-  也筛选出测试集分类不一致的点P2，计算P1，P2点集两两之间的距离，然后将离P2点最近的p1点的label赋给p2
+  也筛选出测试集分类不一致的点P2，计算P1，P2点集两两之间的距离，然后将离P2点最近的p1点的label赋给p2   *done
+  不同比例的smote会给结果造成很大影响，而且smote存在随机性（重复多次smote取多数投票结果）
   
 cross validation  *done
 smote处理样本／调试k值，borderline  *done
