@@ -19,11 +19,11 @@ smote处理样本／调试k值，borderline  *done
 
 未完成：
 stacking参数调整（grid search， rf lr xg）
-测试不同的imbalance处理方法： easyensemble, balancecascade
-kmeans+  后续xgboost   调参
-smoteenn xgboost 调参
-时间切片调参
-多模型投票， 按f1计算权重
+测试不同的imbalance处理方法： easyensemble, balancecascade   （balacecascade效果不好，easyensemble还未尝试）
+kmeans+  后续xgboost   调参   *done  gridsearch
+smoteenn xgboost 调参   *done  grid search
+时间切片调参    *done 
+多模型投票， 按f1计算权重    *done 
 
 
 
@@ -45,12 +45,13 @@ LOF
 
 
 上传结果：
-
-xgSmo_2_pred   最高分
-
+xgSmo_2_pred   0.85
 xgSmo_1_pred  0.83
-
 mixcls_xg_enn  0.82
+xg_stack_5  0.875
+xg_stack_3  0.86
+xg_stack_4  0.873
+
 
 
 
